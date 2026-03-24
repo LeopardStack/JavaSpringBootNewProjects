@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: SpringBootJDK17Demo
