@@ -1,3 +1,30 @@
+server:
+  port: 8080
+
 spring:
-  application:
-    name: SpringBootJDK17Demo
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  datasource:
+    primary:
+      jdbc-url: jdbc:postgresql://192.168.56.101:5432/appdb
+      username: pguser
+      password: pgpassword123
+      driver-class-name: org.postgresql.Driver
+    replica:
+      jdbc-url: jdbc:postgresql://192.168.56.102:5432/appdb
+      username: pguser
+      password: pgpassword123
+      driver-class-name: org.postgresql.Driver
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+app:
+  jwt:
+    secret: "scnu-secret-key-2026-please-change-in-production-env"
+    expiration-ms: 86400000
