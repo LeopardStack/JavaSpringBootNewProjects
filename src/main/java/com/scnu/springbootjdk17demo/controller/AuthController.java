@@ -1,11 +1,11 @@
 package com.scnu.springbootjdk17demo.controller;
 
-
-import com.scnu.springbootjdk17demo.dto.LoginRequest;
-import com.scnu.springbootjdk17demo.dto.LoginResponse;
+import com.scnu.springbootjdk17demo.dto.*;
 import com.scnu.springbootjdk17demo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +18,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest req) {
         LoginResponse resp = userService.login(req.getUsername(), req.getPassword());
-        return ResponseEntity.status(resp.getCode() == 200 ? 200 : resp.getCode()).body(resp);
+        return ResponseEntity.status(resp.getCode()).body(resp);
+    }
+
+    /** 获取当前用户信息（必须带 token） */
+    @GetMapping("/me")
+    public ResponseEntity<UserInfoResponse> me(@AuthenticationPrincipal UserInfoResponse user) {
+        return ResponseEntity.ok(user);
     }
 }

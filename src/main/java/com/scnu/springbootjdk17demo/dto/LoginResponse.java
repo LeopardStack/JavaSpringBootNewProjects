@@ -8,7 +8,5 @@ import lombok.Data;
 public class LoginResponse {
     private Integer code;
     private String  message;
-    private String  token;
-    private String  username;
-    private String  nickname;
+    private String  token;     // 只返这个，详情前端再调 /me
 }
