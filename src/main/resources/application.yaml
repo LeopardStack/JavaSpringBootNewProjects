@@ -15,6 +15,21 @@ spring:
       username: pguser
       password: pgpassword123
       driver-class-name: org.postgresql.Driver
+  data:
+    redis:
+      host: 192.168.56.102        # ← 改成你 node1 的实际 IP
+      port: 6379
+      password: redispassword123
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+  servlet:
+    multipart:
+      max-file-size: 100MB        # 单个 part 上限（每片 5MB 远低于此）
+      max-request-size: 100MB
 
 mybatis-plus:
   configuration:
@@ -28,3 +43,12 @@ app:
   jwt:
     secret: "scnu-secret-key-2026-please-change-in-production-env"
     expiration-ms: 86400000
+
+  minio:
+    endpoint: http://192.168.56.102:9000   # ← 改成你的 node1 IP
+    access-key: minioadmin
+    secret-key: minioadmin123
+    bucket: lms-attachments
+    region: cn-south-1
+    # 前端直传时返回的公网/内网 URL（如果有反向代理就改这里）
+    public-endpoint: http://192.168.56.102:9000

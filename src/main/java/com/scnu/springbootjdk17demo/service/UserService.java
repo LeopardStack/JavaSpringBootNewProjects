@@ -12,10 +12,13 @@ import com.scnu.springbootjdk17demo.mapper.SysPermissionMapper;
 import com.scnu.springbootjdk17demo.mapper.SysRoleMapper;
 import com.scnu.springbootjdk17demo.mapper.SysUserMapper;
 import com.scnu.springbootjdk17demo.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -31,6 +34,7 @@ public class UserService {
     private final SysPermissionMapper permMapper;
     private final PasswordEncoder     passwordEncoder;
     private final JwtUtil             jwtUtil;
+    private final TokenService tokenService;
 
     /** 登录 */
     public LoginResponse login(String username, String password) {
@@ -54,10 +58,13 @@ public class UserService {
         userMapper.updateById(upd);
         DataSourceContextHolder.clear();
 
+        String token = jwtUtil.generate(username);
+        tokenService.store(token, username);   // ← 新增：写入 Redis
+
         log.info("用户 [{}] 登录成功", username);
         return LoginResponse.builder()
                 .code(200).message("登录成功")
-                .token(jwtUtil.generate(username))
+                .token(token)
                 .build();
     }
 
@@ -100,5 +107,14 @@ public class UserService {
                         .children(buildMenuTree(all, p.getCode()))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest req) {
+        String header = req.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            tokenService.revoke(header.substring(7));
+        }
+        return ResponseEntity.ok(Map.of("code", 200, "message", "退出成功"));
     }
 }
